@@ -28,7 +28,7 @@ POST {{baseUrl}}/feedback
 Content-Type: application/json
 
 {
-    "correlationId": "some-uuid-from-query-response",
+    "correlationId": "7007605f-0fff-4d8b-b067-7c0ceeeb1fea",
     "rating": 1
 }
 
@@ -38,7 +38,7 @@ POST {{baseUrl}}/feedback
 Content-Type: application/json
 
 {
-    "correlationId": "some-uuid-from-query-response",
+    "correlationId": "7007605f-0fff-4d8b-b067-7c0ceeeb1fea",
     "rating": -1
 }
 
