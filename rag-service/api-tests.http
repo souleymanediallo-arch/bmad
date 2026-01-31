@@ -1,0 +1,59 @@
+### RAG Service API Tests
+
+@baseUrl = http://localhost:8080/api/v1
+
+### 1. Upload Document
+# @name uploadDocument
+POST {{baseUrl}}/documents
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+This is a test document for RAG ingestion.
+It contains some information about the project.
+--WebAppBoundary--
+
+### 2. Query RAG
+# @name queryRag
+POST {{baseUrl}}/query
+Content-Type: application/json
+
+"What is this project about?"
+
+### 3. Submit Feedback (Thumbs Up)
+# @name submitFeedbackUp
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+
+{
+    "correlationId": "some-uuid-from-query-response",
+    "rating": 1
+}
+
+### 4. Submit Feedback (Thumbs Down)
+# @name submitFeedbackDown
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+
+{
+    "correlationId": "some-uuid-from-query-response",
+    "rating": -1
+}
+
+### 5. Delete Document
+# @name deleteDocument
+DELETE {{baseUrl}}/documents/1
+
+### 6. Actuator Health
+# @name health
+GET http://localhost:8080/actuator/health
+
+### 7. Actuator Info
+# @name info
+GET http://localhost:8080/actuator/info
+
+### 8. Actuator Metrics
+# @name metrics
+GET http://localhost:8080/actuator/metrics
