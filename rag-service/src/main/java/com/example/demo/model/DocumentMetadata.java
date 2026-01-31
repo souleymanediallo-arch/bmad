@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "document_metadata")
@@ -22,6 +23,11 @@ public class DocumentMetadata {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ElementCollection
+    @CollectionTable(name = "document_vector_ids", joinColumns = @JoinColumn(name = "document_id"))
+    @Column(name = "vector_id")
+    private List<String> vectorIds;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -38,4 +44,6 @@ public class DocumentMetadata {
     public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public List<String> getVectorIds() { return vectorIds; }
+    public void setVectorIds(List<String> vectorIds) { this.vectorIds = vectorIds; }
 }

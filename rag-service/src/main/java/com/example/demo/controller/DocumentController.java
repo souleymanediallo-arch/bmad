@@ -26,4 +26,10 @@ public class DocumentController {
             return ResponseEntity.internalServerError().body("Failed to ingest document: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
+        documentService.deleteDocument(id);
+        return ResponseEntity.noContent().build();
+    }
 }

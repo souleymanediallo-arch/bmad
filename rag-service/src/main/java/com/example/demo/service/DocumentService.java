@@ -55,8 +55,19 @@ public class DocumentService {
         metadata.setFileName(file.getOriginalFilename());
         metadata.setContentType(file.getContentType());
         metadata.setFileSize(file.getSize());
+        metadata.setVectorIds(chunks.stream().map(Document::getId).toList());
         repository.save(metadata);
 
         logger.info("Successfully ingested document: {} ({} chunks)", file.getOriginalFilename(), chunks.size());
+    }
+
+    @Transactional
+    public void deleteDocument(Long id) {
+        repository.findById(id).ifPresent(metadata -> {
+            logger.info("Deleting document: {}", metadata.getFileName());
+            vectorStore.delete(metadata.getVectorIds());
+            repository.delete(metadata);
+            logger.info("Successfully deleted document: {}", metadata.getFileName());
+        });
     }
 }
