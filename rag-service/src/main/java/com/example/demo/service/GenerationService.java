@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.dto.RagResponse;
 import com.example.demo.dto.SourceMetadata;
+import com.example.demo.model.QueryLog;
+import com.example.demo.repository.QueryLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.ChatResponse;
@@ -22,13 +24,16 @@ public class GenerationService {
     private static final Logger logger = LoggerFactory.getLogger(GenerationService.class);
     private final OllamaChatClient chatClient;
     private final RetrievalService retrievalService;
+    private final QueryLogRepository queryLogRepository;
 
-    public GenerationService(OllamaChatClient chatClient, RetrievalService retrievalService) {
+    public GenerationService(OllamaChatClient chatClient, RetrievalService retrievalService, QueryLogRepository queryLogRepository) {
         this.chatClient = chatClient;
         this.retrievalService = retrievalService;
+        this.queryLogRepository = queryLogRepository;
     }
 
     public RagResponse generateAnswer(String query) {
+        long startTime = System.currentTimeMillis();
         String correlationId = UUID.randomUUID().toString();
         logger.info("[{}] Processing RAG query: {}", correlationId, query);
 
@@ -62,7 +67,19 @@ public class GenerationService {
                 ))
                 .collect(Collectors.toList());
 
-        logger.info("[{}] Generation complete.", correlationId);
+        long endTime = System.currentTimeMillis();
+        long processingTimeMs = endTime - startTime;
+
+        // 5. Audit Log
+        QueryLog log = new QueryLog();
+        log.setCorrelationId(correlationId);
+        log.setOriginalQuery(query);
+        log.setAnswer(answer);
+        log.setConfidenceScore(1.0); // Placeholder
+        log.setProcessingTimeMs(processingTimeMs);
+        queryLogRepository.save(log);
+
+        logger.info("[{}] Generation complete in {}ms.", correlationId, processingTimeMs);
         return new RagResponse(
                 correlationId,
                 query,
