@@ -10,10 +10,3 @@ public record RagResponse(
     Double confidenceScore,
     List<SourceMetadata> sources
 ) {}
-
-record SourceMetadata(
-    String fileName,
-    Integer pageNumber,
-    Double rerankerScore,
-    String content
-) {}
