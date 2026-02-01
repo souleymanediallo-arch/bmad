@@ -73,8 +73,10 @@ public class GenerationService {
                 Tu n'es PAS un médecin.
                 Sois concis.                
                 CONSIGNES :
-                1. Réponds en deux phrases maximum.
-                2. Utilise l'historique pour comprendre les questions de suivi.                
+                1. Réponds en deux phrases maximum, sauf pour les listes.
+                2. Utilise des listes à puces (bullet points) pour énumérer des services ou des informations multiples.
+                3. Utilise le gras (**texte**) pour les mots-clés importants.
+                4. Utilise l'historique pour comprendre les questions de suivi.                
                 Context:
                 """ + (context.isEmpty() ? "Information non disponible." : context)));
 
