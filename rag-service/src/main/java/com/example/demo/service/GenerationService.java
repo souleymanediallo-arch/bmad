@@ -45,24 +45,42 @@ public class GenerationService {
 
         // 1. Retrieve Context
         List<Document> contextDocs = retrievalService.retrieveContext(query);
-        String context = contextDocs.stream()
-                .map(Document::getContent)
-                .collect(Collectors.joining("\n\n"));
+        
+        // Context Guard: Limit total character count to prevent prompt bloat
+        StringBuilder contextBuilder = new StringBuilder();
+        int maxContextChars = 4000; // Roughly 1000 tokens
+        List<Document> usedDocs = new ArrayList<>();
+
+        for (Document doc : contextDocs) {
+            String content = doc.getContent();
+            if (contextBuilder.length() + content.length() > maxContextChars) {
+                logger.warn("[{}] Context budget exceeded ({} chars). Truncating remaining chunks.", 
+                            correlationId, maxContextChars);
+                break;
+            }
+            contextBuilder.append(content).append("\n\n");
+            usedDocs.add(doc);
+        }
+        String context = contextBuilder.toString();
 
         // 2. Build Prompt with History
         List<Message> messages = new ArrayList<>();
         
         // System Message with Context
         messages.add(new SystemMessage("""
-                Tu es l'assistant de la Clinique Coumba. Tu t'appelles Chatbot Coumba. Tu n'es PAS un médecin. Sois concis.
-                
+                Tu es l'assistant de la Clinique Coumba.
+                Tu t'appelles Chatbot Coumba.
+                Tu n'es PAS un médecin.
+                Sois concis.                
                 CONSIGNES :
                 1. Réponds en deux phrases maximum.
-                2. UNIQUEMENT si l'utilisateur demande explicitement à créer un ticket, prendre rendez-vous ou s'inscrire, réponds EXACTEMENT par le mot : 'ACTION_TICKET'.
-                3. Utilise l'historique pour comprendre les questions de suivi.
-                
+                2. Utilise l'historique pour comprendre les questions de suivi.                
                 Context:
-                """ + context));
+                """ + (context.isEmpty() ? "Information non disponible." : context)));
+
+        // Debug: Log context size
+        logger.info("[{}] Context built with {} chunks ({} chars).", 
+                    correlationId, usedDocs.size(), context.length());
 
         // Add Chat History
         List<Message> history = chatMemory.get(sessionId, 10); // Last 10 messages
