@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1]
+stepsCompleted: [1, 2, 3, 4]
 inputDocuments: ["brainstorming-session-2026-01-31-083617.md", "architecture.md", "ux-design-specification.md"]
 project_name: "Reusable RAG Service"
 ---

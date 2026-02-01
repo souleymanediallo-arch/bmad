@@ -1,6 +1,7 @@
 package com.example.demo.health;
 
-import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -11,9 +12,9 @@ import java.util.Map;
 @Component("rag")
 public class RagHealthIndicator implements HealthIndicator {
 
-    private final OllamaChatClient chatClient;
+    private final OllamaChatModel chatClient;
 
-    public RagHealthIndicator(OllamaChatClient chatClient) {
+    public RagHealthIndicator(OllamaChatModel chatClient) {
         this.chatClient = chatClient;
     }
 
@@ -22,7 +23,7 @@ public class RagHealthIndicator implements HealthIndicator {
         Map<String, Object> details = new HashMap<>();
         try {
             // Simple check for Ollama connectivity
-            chatClient.call("health check");
+            chatClient.call(new Prompt("health check"));
             details.put("ollama", "UP");
             return Health.up().withDetails(details).build();
         } catch (Exception e) {
